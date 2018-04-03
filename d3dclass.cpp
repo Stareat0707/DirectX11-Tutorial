@@ -23,27 +23,12 @@ D3DClass::~D3DClass()
 bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float screenDepth, float screenNear)
 {
 	HRESULT result;
-	IDXGIFactory* factory;
-	IDXGIAdapter* adapter;
-	IDXGIOutput* adapterOutput;
-	unsigned int numModes, i, numerator, denominator, stringLength;
-	DXGI_MODE_DESC* displayModeList;
-	DXGI_ADAPTER_DESC adapterDesc;
-	int error;
-	DXGI_SWAP_CHAIN_DESC swapChainDesc;
-	D3D_FEATURE_LEVEL featureLevel;
-	ID3D11Texture2D* backbufferPtr;
-	D3D11_TEXTURE2D_DESC depthBufferDesc;
-	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
-	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
-	D3D11_RASTERIZER_DESC rasterDesc;
-	D3D11_VIEWPORT viewport;
-	float fieldOfView, screenAspect;
 
 	// vsync(수직동기화) 설정을 저장합니다.
 	m_vsync_enabled = vsync;
 
 	// DirectX 그래픽 인터페이스 팩토리를 만듭니다.
+	IDXGIFactory* factory;
 	result = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory);
 	if (FAILED(result))
 	{
@@ -51,6 +36,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	}
 
 	// 팩토리 객체를 사용하여 첫번째 그래픽 카드 인터페이스에 대한 아답터를 만듭니다.
+	IDXGIAdapter* adapter;
 	result = factory->EnumAdapters(0, &adapter);
 	if (FAILED(result))
 	{
@@ -58,6 +44,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	}
 
 	// 출력(모니터)에 대한 첫번째 아답터를 나열합니다.
+	IDXGIOutput* adapterOutput;
 	result = adapter->EnumOutputs(0, &adapterOutput);
 	if (FAILED(result))
 	{
@@ -65,6 +52,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	}
 
 	// DXGI_FORMAT_R8G8B8A8_UNORM 모니터 출력 디스플레이 포맷에 맞는 모드의 개수를 구합니다.
+	unsigned int numModes;
 	result = adapterOutput->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &numModes, NULL);
 	if (FAILED(result))
 	{
@@ -72,7 +60,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	}
 
 	// 가능한 모든 모니터와 그래픽카드 조합을 저장할 리스트를 생성합니다.
-	displayModeList = new DXGI_MODE_DESC[numModes];
+	DXGI_MODE_DESC* displayModeList = new DXGI_MODE_DESC[numModes];
 	if (!displayModeList)
 	{
 		return false;
@@ -87,7 +75,8 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 
 	// 이제 모든 디스플레이 모드에 대해 화면 너비/높이에 맞는 디스플레이 모드를 찾습니다.
 	// 적합한 것을 찾으면 모니터의 새로고침 비율의 분모와 분자 값을 저장합니다.
-	for (i = 0; i < numModes; ++i)
+	unsigned int numerator, denominator;
+	for (unsigned int i = 0; i < numModes; ++i)
 	{
 		if (displayModeList[i].Width == (unsigned int)screenWidth)
 		{
@@ -100,6 +89,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	}
 
 	// 아답터(그래픽카드)의 description을 가져옵니다.
+	DXGI_ADAPTER_DESC adapterDesc;
 	result = adapter->GetDesc(&adapterDesc);
 	if (FAILED(result))
 	{
@@ -110,7 +100,8 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	m_videoCardMemory = (int)(adapterDesc.DedicatedVideoMemory / 1024 / 1024);
 
 	// 그래픽 카드의 이름을 char형 문자열 배열로 바꾼 뒤 저장합니다.
-	error = wcstombs_s(&stringLength, m_videoCardDescription, adapterDesc.Description, 128);
+	unsigned int stringLength;
+	int error = wcstombs_s(&stringLength, m_videoCardDescription, adapterDesc.Description, 128);
 	if (error != 0)
 	{
 		return false;
@@ -133,6 +124,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	factory = 0;
 
 	// 스왑 체인 description을 초기화합니다.
+	DXGI_SWAP_CHAIN_DESC swapChainDesc;
 	ZeroMemory(&swapChainDesc, sizeof(swapChainDesc));
 
 	// 하나의 백버퍼만을 사용하도록 합니다.
@@ -188,7 +180,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	swapChainDesc.Flags = 0;
 
 	// 파쳐 레벨을 DirectX 11로 설정합니다.
-	featureLevel = D3D_FEATURE_LEVEL_11_0;
+	D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_11_0;
 
 	// 스왑 체인, Direct3D 디바이스, Direct3D 디바이스 컨텍스트를 생성합니다.
 	result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, &featureLevel, 1, D3D11_SDK_VERSION, &swapChainDesc, &m_swapChain, &m_device, NULL, &m_deviceContext);
@@ -198,6 +190,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	}
 
 	// 백버퍼의 포인터를 가져옵니다.
+	ID3D11Texture2D* backbufferPtr;
 	result = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backbufferPtr);
 	if (FAILED(result))
 	{
@@ -216,6 +209,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	backbufferPtr = 0;
 
 	// 깊이 버퍼의 description을 초기화합니다.
+	D3D11_TEXTURE2D_DESC depthBufferDesc;
 	ZeroMemory(&depthBufferDesc, sizeof(depthBufferDesc));
 
 	// 깊이 버퍼의 description을 작성합니다.
@@ -239,6 +233,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	}
 
 	// 스텐실 상태의 description을 초기화합니다.
+	D3D11_DEPTH_STENCIL_DESC depthStencilDesc;
 	ZeroMemory(&depthStencilDesc, sizeof(depthStencilDesc));
 
 	// 스텐실 상태의 description을 작성합니다.
@@ -273,6 +268,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	m_deviceContext->OMSetDepthStencilState(m_depthStencilState, 1);
 
 	// 깊이-스텐실 뷰의 description을 초기화합니다.
+	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 	ZeroMemory(&depthStencilViewDesc, sizeof(depthStencilViewDesc));
 
 	// 깊이-스텐실 뷰의 description을 작성합니다.
@@ -291,6 +287,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
 
 	// 어떤 도형을 어떻게 그릴 것인지 결정하는 래스터화기 description을 작성합니다.
+	D3D11_RASTERIZER_DESC rasterDesc;
 	rasterDesc.AntialiasedLineEnable = false;
 	rasterDesc.CullMode = D3D11_CULL_BACK;
 	rasterDesc.DepthBias = 0;
@@ -313,6 +310,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	m_deviceContext->RSSetState(m_rasterState);
 
 	// 렌더링을 위한 뷰포트를 설정합니다.
+	D3D11_VIEWPORT viewport;
 	viewport.Width = (float)screenWidth;
 	viewport.Height = (float)screenHeight;
 	viewport.MinDepth = 0.0f;
@@ -324,8 +322,8 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	m_deviceContext->RSSetViewports(1, &viewport);
 
 	// 투영 행렬을 설정합니다.
-	fieldOfView = (float)D3DX_PI / 4.0f;
-	screenAspect = (float)screenWidth / (float)screenHeight;
+	float fieldOfView = (float)D3DX_PI / 4.0f;
+	float screenAspect = (float)screenWidth / (float)screenHeight;
 
 	// 3D 렌더링을 위한 투영 행렬을 생성합니다.
 	D3DXMatrixPerspectiveFovLH(&m_projectionMatrix, fieldOfView, screenAspect, screenNear, screenDepth);
@@ -400,9 +398,8 @@ void D3DClass::Shutdown()
 
 void D3DClass::BeginScene(float red, float green, float blue, float alpha)
 {
-	float color[4];
-
 	// 버퍼를 어떤 색상으로 지울 것인지 설정합니다.
+	float color[4];
 	color[0] = red;
 	color[1] = green;
 	color[2] = blue;

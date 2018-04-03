@@ -2,11 +2,10 @@
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PSTR psCmdline, int iCmdshow)
 {
-	SystemClass* System;
 	bool result;
 
 	// system 객체를 생성한다.
-	System = new SystemClass;
+	SystemClass* System = new SystemClass;
 	if (!System)
 	{
 		return 0;

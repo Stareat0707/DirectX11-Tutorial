@@ -14,10 +14,8 @@ InputClass::~InputClass()
 
 void InputClass::Initialize()
 {
-	int i;
-
 	// 모든 키들을 눌리지 않은 상태로 초기화합니다.
-	for (i = 0; i < 256; ++i)
+	for (int i = 0; i < 256; ++i)
 	{
 		m_keys[i] = false;
 	}

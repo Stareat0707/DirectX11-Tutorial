@@ -16,12 +16,11 @@ SystemClass::~SystemClass()
 
 bool SystemClass::Initialize()
 {
-	int screenWidth, screenHeight;
 	bool result;
 
 	// 함수의 높이와 너비를 전달하기 전에 변수를 0으로 초기화한다.
-	screenWidth = 0;
-	screenHeight = 0;
+	int screenWidth = 0;
+	int screenHeight = 0;
 
 	// 윈도우즈 api를 사용하여 초기화한다.
 	InitializeWindows(screenWidth, screenHeight);
@@ -77,14 +76,14 @@ void SystemClass::Shutdown()
 
 void SystemClass::Run()
 {
-	MSG msg;
-	bool done, result;
+	bool result;
 
 	// 메세지 구조체를 초기화합니다.
+	MSG msg;
 	ZeroMemory(&msg, sizeof(MSG));
 
 	// 유저로부터 종료 메세지를 받을 때까지 루프를 돕니다.
-	done = false;
+	bool done = false;
 	while (!done)
 	{
 		// 윈도우 메세지를 처리합니다.
@@ -148,10 +147,6 @@ LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam
 
 void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 {
-	WNDCLASSEX wc;
-	DEVMODE dmScreenSettings;
-	int posX, posY;
-
 	// 외부 포인터를 이 객체로 설정합니다.
 	ApplicationHandle = this;
 
@@ -159,9 +154,10 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 	m_hinstance = GetModuleHandle(NULL);
 
 	// 어플리케이션의 이름을 설정합니다.
-	m_applicationName = "Engine";
+	m_applicationName = L"Engine";
 
 	// 윈도우 클래스를 기본 설정으로 맞춥니다.
+	WNDCLASSEX wc;
 	wc.style = CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
 	wc.lpfnWndProc = WndProc;
 	wc.cbClsExtra = 0;
@@ -183,9 +179,11 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 	screenHeight = GetSystemMetrics(SM_CYSCREEN);
 
 	// 풀스크린 모드 변수의 값에 따라 화면 설정을 합니다.
+	int posX, posY;
 	if (FULL_SCREEN)
 	{
 		// 만약 풀스크린 모드라면 화면 크기를 데스크톱 크기에 맞추고 색상을 32bit로 합니다.
+		DEVMODE dmScreenSettings;
 		memset(&dmScreenSettings, 0, sizeof(dmScreenSettings));
 		dmScreenSettings.dmSize = sizeof(dmScreenSettings);
 		dmScreenSettings.dmPelsWidth = (unsigned long)screenWidth;
