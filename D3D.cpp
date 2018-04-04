@@ -1,6 +1,6 @@
-#include "d3dclass.h"
+#include "D3D.h"
 
-D3DClass::D3DClass()
+D3D::D3D()
 {
 	m_swapChain = 0;
 	m_device = 0;
@@ -12,15 +12,15 @@ D3DClass::D3DClass()
 	m_rasterState = 0;
 }
 
-D3DClass::D3DClass(const D3DClass& other)
+D3D::D3D(const D3D& other)
 {
 }
 
-D3DClass::~D3DClass()
+D3D::~D3D()
 {
 }
 
-bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float screenDepth, float screenNear)
+bool D3D::initialize(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool fullscreen, float screenDepth, float screenNear)
 {
 	HRESULT result;
 
@@ -337,7 +337,7 @@ bool D3DClass::Initialize(int screenWidth, int screenHeight, bool vsync, HWND hw
 	return true;
 }
 
-void D3DClass::Shutdown()
+void D3D::shutdown()
 {
 	// 종료하기 전에 이렇게 윈도우 모드로 바꾸지 않으면 스왑체인을 할당 해제할 때 예외가 발생합니다.
 	if (m_swapChain)
@@ -396,7 +396,7 @@ void D3DClass::Shutdown()
 	return;
 }
 
-void D3DClass::BeginScene(float red, float green, float blue, float alpha)
+void D3D::beginScene(float red, float green, float blue, float alpha)
 {
 	// 버퍼를 어떤 색상으로 지울 것인지 설정합니다.
 	float color[4];
@@ -414,7 +414,7 @@ void D3DClass::BeginScene(float red, float green, float blue, float alpha)
 	return;
 }
 
-void D3DClass::EndScene()
+void D3D::endScene()
 {
 	// 렌더링이 완료되었으므로 백버퍼의 내용을 화면에 표시합니다.
 	if (m_vsync_enabled)
@@ -431,35 +431,35 @@ void D3DClass::EndScene()
 	return;
 }
 
-ID3D11Device* D3DClass::GetDevice()
+ID3D11Device* D3D::getDevice()
 {
 	return m_device;
 }
 
-ID3D11DeviceContext* D3DClass::GetDeviceContext()
+ID3D11DeviceContext* D3D::getDeviceContext()
 {
 	return m_deviceContext;
 }
 
-void D3DClass::GetProjectionMatrix(D3DXMATRIX& projectionMatrix)
+void D3D::getProjectionMatrix(D3DXMATRIX& projectionMatrix)
 {
 	projectionMatrix = m_projectionMatrix;
 	return;
 }
 
-void D3DClass::GetWolrdMatrix(D3DXMATRIX& worldMatrix)
+void D3D::getWolrdMatrix(D3DXMATRIX& worldMatrix)
 {
 	worldMatrix = m_worldMatrix;
 	return;
 }
 
-void D3DClass::GetOrthoMatrix(D3DXMATRIX& orthoMatrix)
+void D3D::getOrthoMatrix(D3DXMATRIX& orthoMatrix)
 {
 	orthoMatrix = m_orthoMatrix;
 	return;
 }
 
-void D3DClass::GetVideoCardInfo(char* cardName, int& memory)
+void D3D::getVideoCardInfo(char* cardName, int& memory)
 {
 	strcpy_s(cardName, 128, m_videoCardDescription);
 	memory = m_videoCardMemory;

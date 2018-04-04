@@ -1,20 +1,20 @@
-#include "systemclass.h"
+#include "System.h"
 
-SystemClass::SystemClass()
+System::System()
 {
-	m_Input = 0;
-	m_Graphics = 0;
+	m_input = 0;
+	m_graphics = 0;
 }
 
-SystemClass::SystemClass(const SystemClass& other)
-{
-}
-
-SystemClass::~SystemClass()
+System::System(const System& other)
 {
 }
 
-bool SystemClass::Initialize()
+System::~System()
+{
+}
+
+bool System::initialize()
 {
 	bool result;
 
@@ -23,26 +23,26 @@ bool SystemClass::Initialize()
 	int screenHeight = 0;
 
 	// 윈도우즈 api를 사용하여 초기화한다.
-	InitializeWindows(screenWidth, screenHeight);
+	initializeWindows(screenWidth, screenHeight);
 
 	// input 객체를 생성합니다. 이 객체는 유저로부터 들어오는 키보드 입력을 처리하기 위해 사용합니다.
-	m_Input = new InputClass;
-	if (!m_Input)
+	m_input = new Input;
+	if (!m_input)
 	{
 		return false;
 	}
 
 	// input 객체를 초기화합니다.
-	m_Input->Initialize();
+	m_input->initialize();
 
 	// graphics 객체를 생성합니다. 이 객체는 이 어플리케이션의 모든 그래픽 요소를 그리는 일을 합니다.
-	m_Graphics = new GraphicsClass;
-	if (!m_Graphics)
+	m_graphics = new Graphics;
+	if (!m_graphics)
 	{
 		return false;
 	}
 
-	result = m_Graphics->Initialize(screenWidth, screenHeight, m_hwnd);
+	result = m_graphics->initialize(screenWidth, screenHeight, m_hwnd);
 	if (!result)
 	{
 		return false;
@@ -51,30 +51,30 @@ bool SystemClass::Initialize()
 	return true;
 }
 
-void SystemClass::Shutdown()
+void System::shutdown()
 {
 	// Graphics 객체를 반환합니다.
-	if (m_Graphics)
+	if (m_graphics)
 	{
-		m_Graphics->Shutdown();
-		delete m_Graphics;
-		m_Graphics = 0;
+		m_graphics->shutdown();
+		delete m_graphics;
+		m_graphics = 0;
 	}
 
 	// Input 객체를 반환합니다.
-	if (m_Input)
+	if (m_input)
 	{
-		delete m_Input;
-		m_Input = 0;
+		delete m_input;
+		m_input = 0;
 	}
 
 	// 창을 종료시킵니다.
-	ShutdownWindows();
+	shutdownWindows();
 
 	return;
 }
 
-void SystemClass::Run()
+void System::run()
 {
 	bool result;
 
@@ -100,7 +100,7 @@ void SystemClass::Run()
 		}
 		else
 		{
-			result = Frame();
+			result = frame();
 			if (!result)
 			{
 				done = true;
@@ -111,17 +111,17 @@ void SystemClass::Run()
 	return;
 }
 
-bool SystemClass::Frame()
+bool System::frame()
 {
 	bool result;
 
 	// 유저가 Esc 키를 눌러 어플리케이션을 종료하기를 원하는지 확인합니다.
-	if (m_Input->IsKeyDown(VK_ESCAPE))
+	if (m_input->isKeyDown(VK_ESCAPE))
 	{
 		return false;
 	}
 
-	result = m_Graphics->Frame();
+	result = m_graphics->frame();
 	if(!result)
 	{
 		return false;
@@ -130,22 +130,22 @@ bool SystemClass::Frame()
 	return true;
 }
 
-LRESULT CALLBACK SystemClass::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
+LRESULT CALLBACK System::messageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPARAM lparam)
 {
 	switch (umsg)
 	{
 	case WM_KEYDOWN:
-		m_Input->KeyDown((unsigned int)wparam);
+		m_input->keyDown((unsigned int)wparam);
 		return 0;
 	case WM_KEYUP:
-		m_Input->KeyUp((unsigned int)wparam);
+		m_input->keyUp((unsigned int)wparam);
 		return 0;
 	default:
 		return DefWindowProc(hwnd, umsg, wparam, lparam);
 	}
 }
 
-void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
+void System::initializeWindows(int& screenWidth, int& screenHeight)
 {
 	// 외부 포인터를 이 객체로 설정합니다.
 	ApplicationHandle = this;
@@ -222,7 +222,7 @@ void SystemClass::InitializeWindows(int& screenWidth, int& screenHeight)
 	return;
 }
 
-void SystemClass::ShutdownWindows()
+void System::shutdownWindows()
 {
 	// 마우스 커서를 표시합니다.
 	ShowCursor(true);
@@ -267,7 +267,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT umessage, WPARAM wparam, LPARAM lparam)
 
 		default:
 		{
-			return ApplicationHandle->MessageHandler(hwnd, umessage, wparam, lparam);
+			return ApplicationHandle->messageHandler(hwnd, umessage, wparam, lparam);
 		}
 	}
 }

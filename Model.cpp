@@ -1,24 +1,33 @@
-#include "modelclass.h"
+#include "Model.h"
 
-ModelClass::ModelClass()
+Model::Model()
 {
 	m_vertexBuffer = 0;
 	m_indexBuffer = 0;
+	m_texture = 0;
 }
 
-ModelClass::ModelClass(const ModelClass& other)
+Model::Model(const Model& other)
 {
 }
 
-ModelClass::~ModelClass()
+Model::~Model()
 {
 }
 
-bool ModelClass::Initialize(ID3D11Device* device)
+bool Model::initialize(ID3D11Device* device, WCHAR* textureFilename)
 {
 	bool result;
 
-	result = InitializeBuffers(device);
+	// 삼각형의 형상을 유지하는 정점 및 인덱스 버퍼를 초기화합니다.
+	result = initializeBuffers(device);
+	if (!result)
+	{
+		return false;
+	}
+
+	// 이 모델의 텍스처를 로드합니다.
+	result = loadTexture(device, textureFilename);
 	if (!result)
 	{
 		return false;
@@ -27,28 +36,36 @@ bool ModelClass::Initialize(ID3D11Device* device)
 	return true;
 }
 
-void ModelClass::Shutdown()
+void Model::shutdown()
 {
+	// 모델 텍스처를 해제합니다.
+	releaseTexture();
+
 	// 정점 버퍼와 인덱스 버퍼를 해제합니다.
-	ShutdownBuffers();
+	shutdownBuffers();
 
 	return;
 }
 
-void ModelClass::Render(ID3D11DeviceContext* deviceContext)
+void Model::render(ID3D11DeviceContext* deviceContext)
 {
 	// 정점 버퍼와 인덱스 버퍼를 그래픽스 파이프라인에 넣어 화면에 그릴 준비를 합니다.
-	RenderBuffers(deviceContext);
+	renderBuffers(deviceContext);
 
 	return;
 }
 
-int ModelClass::GetIndexCount()
+int Model::getIndexCount()
 {
 	return m_indexCount;
 }
 
-bool ModelClass::InitializeBuffers(ID3D11Device* device)
+ID3D11ShaderResourceView* Model::getTexture()
+{
+	return m_texture->getTexture();
+}
+
+bool Model::initializeBuffers(ID3D11Device* device)
 {
 	HRESULT result;
 
@@ -73,14 +90,14 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	}
 
 	// 정점 배열에 값을 넣습니다.
-	vertices[0].position = D3DXVECTOR3(-1.0f, -1.0f, 0.0f);
-	vertices[0].color = D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f);
+	vertices[0].position = D3DXVECTOR3(-1.0f, -1.0f, 0.0f);	// 왼쪽 아래
+	vertices[0].texture = D3DXVECTOR2(0.0f, 1.0f);
 	
-	vertices[1].position = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-	vertices[1].color = D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f);
+	vertices[1].position = D3DXVECTOR3(0.0f, 1.0f, 0.0f);	// 상단 가운데
+	vertices[1].texture = D3DXVECTOR2(0.5f, 0.0f);
 
-	vertices[2].position = D3DXVECTOR3(1.0f, -1.0f, 0.0f);
-	vertices[2].color = D3DXVECTOR4(0.0f, 1.0f, 0.0f, 1.0f);
+	vertices[2].position = D3DXVECTOR3(1.0f, -1.0f, 0.0f);	// 오른쪽 아래
+	vertices[2].texture = D3DXVECTOR2(1.0f, 1.0f);
 
 	// 인덱스 배열에 값을 넣습니다.
 	indices[0] = 0;	// 왼쪽 아래
@@ -141,7 +158,7 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	return true;
 }
 
-void ModelClass::ShutdownBuffers()
+void Model::shutdownBuffers()
 {
 	// 인덱스 버퍼를 해제합니다.
 	if (m_indexBuffer)
@@ -160,7 +177,7 @@ void ModelClass::ShutdownBuffers()
 	return;
 }
 
-void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
+void Model::renderBuffers(ID3D11DeviceContext* deviceContext)
 {
 	// 정점 버퍼의 단위와 오프셋을 설정합니다.
 	unsigned int stride = sizeof(VertexType);
@@ -174,6 +191,40 @@ void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 
 	// 정점 버퍼로 그릴 기본형을 설정합니다. 여기서는 삼각형입니다.
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+	return;
+}
+
+bool Model::loadTexture(ID3D11Device* device, WCHAR* filename)
+{
+	bool result;
+
+	// 텍스쳐 객체를 생성합니다.
+	m_texture = new Texture;
+	if (!m_texture)
+	{
+		return false;
+	}
+
+	// 텍스쳐 객체를 초기화합니다.
+	result = m_texture->initialize(device, filename);
+	if (!result)
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void Model::releaseTexture()
+{
+	// 텍스쳐 객체를 해제합니다.
+	if (m_texture)
+	{
+		m_texture->shutdown();
+		delete m_texture;
+		m_texture = 0;
+	}
 
 	return;
 }

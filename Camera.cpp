@@ -1,6 +1,6 @@
-#include "cameraclass.h"
+#include "Camera.h"
 
-CameraClass::CameraClass()
+Camera::Camera()
 {
 	m_positionX = 0;
 	m_positionY = 0;
@@ -11,15 +11,15 @@ CameraClass::CameraClass()
 	m_rotationZ = 0;
 }
 
-CameraClass::CameraClass(const CameraClass& other)
+Camera::Camera(const Camera& other)
 {
 }
 
-CameraClass::~CameraClass()
+Camera::~Camera()
 {
 }
 
-void CameraClass::SetPosition(float x, float y, float z)
+void Camera::setPosition(float x, float y, float z)
 {
 	m_positionX = x;
 	m_positionY = y;
@@ -27,7 +27,7 @@ void CameraClass::SetPosition(float x, float y, float z)
 	return;
 }
 
-void CameraClass::SetRotation(float x, float y, float z)
+void Camera::setRotation(float x, float y, float z)
 {
 	m_rotationX = x;
 	m_rotationY = y;
@@ -35,17 +35,17 @@ void CameraClass::SetRotation(float x, float y, float z)
 	return;
 }
 
-D3DXVECTOR3 CameraClass::GetPosition()
+D3DXVECTOR3 Camera::getPosition()
 {
 	return D3DXVECTOR3(m_positionX, m_positionY, m_positionZ);
 }
 
-D3DXVECTOR3 CameraClass::GetRotation()
+D3DXVECTOR3 Camera::getRotation()
 {
 	return D3DXVECTOR3(m_rotationX, m_rotationY, m_rotationZ);
 }
 
-void CameraClass::Render()
+void Camera::render()
 {
 	// 위쪽을 가리키도록 벡터를 설정합니다.
 	D3DXVECTOR3 up;
@@ -87,7 +87,7 @@ void CameraClass::Render()
 	return;
 }
 
-void CameraClass::GetViewMatrix(D3DXMATRIX& viewMatrix)
+void Camera::getViewMatrix(D3DXMATRIX& viewMatrix)
 {
 	viewMatrix = m_viewMatrix;
 	return;

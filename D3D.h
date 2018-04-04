@@ -10,27 +10,27 @@
 #include <D3D11.h>
 #include <D3DX10math.h>
 
-class D3DClass
+class D3D
 {
 public:
-	D3DClass();
-	D3DClass(const D3DClass&);
-	~D3DClass();
+	D3D();
+	D3D(const D3D&);
+	~D3D();
 
-	bool Initialize(int, int, bool, HWND, bool, float, float);
-	void Shutdown();
+	bool initialize(int, int, bool, HWND, bool, float, float);
+	void shutdown();
 	
-	void BeginScene(float, float, float, float);
-	void EndScene();
+	void beginScene(float, float, float, float);
+	void endScene();
 
-	ID3D11Device* GetDevice();
-	ID3D11DeviceContext* GetDeviceContext();
+	ID3D11Device* getDevice();
+	ID3D11DeviceContext* getDeviceContext();
 
-	void GetProjectionMatrix(D3DXMATRIX&);
-	void GetWolrdMatrix(D3DXMATRIX&);
-	void GetOrthoMatrix(D3DXMATRIX&);
+	void getProjectionMatrix(D3DXMATRIX&);
+	void getWolrdMatrix(D3DXMATRIX&);
+	void getOrthoMatrix(D3DXMATRIX&);
 
-	void GetVideoCardInfo(char*, int&);
+	void getVideoCardInfo(char*, int&);
 
 private:
 	bool m_vsync_enabled;
