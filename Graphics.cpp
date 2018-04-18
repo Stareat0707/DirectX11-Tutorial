@@ -54,7 +54,7 @@ bool Graphics::initialize(int& screenWidth, int& screenHeight, HWND hwnd)
 	}
 
 	// 모델 객체를 초기화합니다.
-	result = m_model->initialize(m_d3d->getDevice(), const_cast<WCHAR*>(L"../Engine/data/seafloor.dds"));
+	result = m_model->initialize(m_d3d->getDevice(), const_cast<char*>("../Engine/data/Cube.txt"), const_cast<WCHAR*>(L"../Engine/data/seafloor.dds"));
 	if (!result)
 	{
 		MessageBox(hwnd, L"Could not initialize the model object", L"Error", MB_OK);
@@ -84,7 +84,7 @@ bool Graphics::initialize(int& screenWidth, int& screenHeight, HWND hwnd)
 	}
 
 	// 조명 객체를 초기화합니다.
-	m_light->setDiffuseColor(1.0f, 0.0f, 1.0f, 1.0f);
+	m_light->setDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
 	m_light->setDirection(0.0f, 0.0f, 1.0f);
 
 	return true;
