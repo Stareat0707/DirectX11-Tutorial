@@ -3,7 +3,8 @@
 #include "D3D.h"
 #include "Camera.h"
 #include "Model.h"
-#include "TextureShader.h"
+#include "LightShader.h"
+#include "Light.h"
 
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
@@ -22,11 +23,12 @@ public:
 	bool frame();
 
 private:
-	bool render();
+	bool render(float);
 
 private:
 	D3D* m_d3d;
 	Camera* m_camera;	
 	Model* m_model;
-	TextureShader* m_textureShader;
+	LightShader* m_lightShader;
+	Light* m_light;
 };

@@ -92,12 +92,15 @@ bool Model::initializeBuffers(ID3D11Device* device)
 	// 정점 배열에 값을 넣습니다.
 	vertices[0].position = D3DXVECTOR3(-1.0f, -1.0f, 0.0f);	// 왼쪽 아래
 	vertices[0].texture = D3DXVECTOR2(0.0f, 1.0f);
+	vertices[0].normal = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
 	
 	vertices[1].position = D3DXVECTOR3(0.0f, 1.0f, 0.0f);	// 상단 가운데
 	vertices[1].texture = D3DXVECTOR2(0.5f, 0.0f);
+	vertices[1].normal = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
 
 	vertices[2].position = D3DXVECTOR3(1.0f, -1.0f, 0.0f);	// 오른쪽 아래
 	vertices[2].texture = D3DXVECTOR2(1.0f, 1.0f);
+	vertices[2].normal = D3DXVECTOR3(0.0f, 0.0f, -1.0f);
 
 	// 인덱스 배열에 값을 넣습니다.
 	indices[0] = 0;	// 왼쪽 아래
